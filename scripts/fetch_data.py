@@ -27,7 +27,10 @@ def fetch_gfz(force=False):
     df["Ap"] = df["Ap"].replace(-1, np.nan)
     df["SN"] = df["SN"].replace(-1, np.nan)
     df["F107obs"] = df["F107obs"].replace(-1.0, np.nan)
-    df = df[["Ap", "SN", "F107obs"]]
+    kp_cols = [f"Kp{i}" for i in range(1, 9)]
+    df[kp_cols] = df[kp_cols].replace(-1.0, np.nan)
+    df["Kp"] = df[kp_cols].mean(axis=1)
+    df = df[["Ap", "Kp", "SN", "F107obs"]]
 
     DATA_DIR.mkdir(exist_ok=True)
     df.to_csv(out_path)

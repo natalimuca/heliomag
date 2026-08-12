@@ -80,6 +80,62 @@ just reanalysis, so it's the natural next step if this is worth pursuing further
 target was considered but dropped for now since it needs a new external data source not already
 cached locally.
 
+## Follow-up: denser training-window sampling (598 -> 1785 train rows)
+
+Ran the untried lever above. Extracted embeddings at every-3-days spacing across the training
+window only (2010-05-16 to 2021-12-31 — the test window, 2022-2024, stays at the original weekly
+cadence, 156 rows, unchanged), via two Kaggle sessions (v9 ran ~12h before Kaggle's own session
+cap auto-cancelled it at 95% done; v10 finished the remaining 71 targets cleanly in under an hour).
+Final training set: 1785 rows (3.0x), full dataset 1941 embeddings total.
+
+### Target: Ap (denser training set)
+
+| lead (days) | classical (linear) | embed (PCA+Ridge) | embed+classical | embed (PCA+MLP) | residual-correction |
+|---|---|---|---|---|---|
+| 3  | **8.43** | 8.70 | 8.67 | 23.76 | 8.56 |
+| 5  | **15.32** | 15.59 | 15.57 | 19.46 | 15.58 |
+| 7  | **12.34** | 14.46 | 14.21 | 13.75 | 14.60 |
+| 10 | **8.41** | 9.00 | 9.00 | 12.00 | 9.15 |
+| 14 | **12.36** | 12.92 | 12.88 | 16.91 | 12.64 |
+
+### Target: Kp (denser training set)
+
+| lead (days) | classical (linear) | embed (PCA+Ridge) | embed+classical | embed (PCA+MLP) | residual-correction |
+|---|---|---|---|---|---|
+| 3  | **0.87** | 0.94 | 0.93 | 1.66 | 0.89 |
+| 5  | **1.10** | 1.14 | 1.15 | 1.30 | 1.16 |
+| 7  | **1.08** | 1.43 | 1.44 | 1.44 | 1.49 |
+| 10 | **0.88** | 1.03 | 1.03 | 1.10 | 1.05 |
+| 14 | **1.08** | 1.27 | 1.26 | 1.79 | 1.23 |
+
+**Classical wins every single lead time for both targets now — no more ties.** Tripling the
+training rows did not flip the headline result. But the *size* of the gap moved in genuinely
+informative, if mixed, ways:
+
+- **The one lead-10 result that looked like an embedding edge in the original (weekly-only) run
+  reversed.** Ap lead 10 went from embed beating classical by 0.16 RMSE to classical beating embed
+  by 0.58; Kp lead 10 did the same (0.02 -> 0.14 in classical's favor). Both "ties" in the earlier
+  writeup were flagged there as thin, single-fold evidence — this is exactly the kind of result
+  that flag was for. Treat the original lead-10 finding as retracted: it didn't survive more data.
+- **Lead 5 gap shrank sharply for both targets** (Ap: 1.89 -> 0.27 RMSE; Kp: 0.45 -> 0.04), the
+  strongest evidence so far that sample size was a real constraint, not just Surya lacking signal.
+- **Other lead times were flat or slightly worse** (Ap lead 3, 7, 14 and Kp lead 3, 7, 14 all moved
+  a little in classical's favor or stayed flat) — this is not a clean, uniform "more data helps"
+  story.
+- **The MLP variant is dramatically less broken.** It's no longer the worst option everywhere — at
+  Ap lead 7 it actually beats the linear embed and residual-correction variants (13.75 vs. 14.46 /
+  14.60), still short of classical (12.34) but a real qualitative change from before, when it was
+  catastrophically bad (22.16) at the same lead time. More rows clearly helped the model class
+  that needed them most.
+
+**Net read:** sample size was a real, partial constraint — the evidence for that is now much
+better than a plausible-sounding excuse (lead 5, MLP behavior). But it was not *the whole*
+explanation, since most lead times didn't move much and none crossed over. Going further (e.g.
+full daily density, ~38h more compute per the original scoping table) is a much larger commitment
+for an uncertain further gain given this mixed pattern — better spent, if pursued at all, on the
+signal-resolution explanation instead (different embedding pooling, non-weekly-anchored inputs)
+than on brute-forcing more of the same weekly-derived density.
+
 ## Data coverage note
 
 `embeddings_merged.npz` covers 754 of 764 expected weekly slots (2010-05-16 to 2024-12-29,
@@ -91,3 +147,10 @@ data already in `embeddings_merged.npz`, and all 52 weekly attempts in 2025 fail
 (`Failed listing s3://nasa-surya-bench/2025/...`) — the NASA Surya benchmark bucket does not yet
 mirror 2025 data. 2010-2024 weekly coverage is as complete as the source allows; 2025 is blocked
 upstream, not locally.
+
+The every-3-days densification (previous section) hit the same kind of gap at finer resolution:
+30 of 1416 targeted training-window dates (2.1%) failed on a completed (not cancelled) session,
+clustered in multi-day runs immediately around the same dates already known missing from the
+weekly grid (e.g. clusters around 2012-09, 2013-04, 2016-08, 2018-12) — consistent with real
+multi-day SDO instrument outages showing up as a single missing week at coarse resolution and a
+short burst of missing days at finer resolution, not a pipeline issue.

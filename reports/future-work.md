@@ -262,12 +262,16 @@ components, something will always look periodic.
 
 ## Smaller items
 
-- Two unused icon files remain in `public/`, `icon-dark-32x32.png` and
-  `icon-light-32x32.png`, unreferenced since the icon fix in `962ce99`. They were
-  presumably intended for light and dark favicon variants, which Next's file
-  convention cannot express with media queries. Either wire them up through
-  explicit `metadata.icons` entries with `media`, being careful about basePath,
-  or delete them.
+- **Resolved.** `app/icon.svg` and `app/apple-icon.png` were the placeholder
+  v0.dev logo mark left over from scaffolding the site, never swapped for real
+  branding. The `962ce99` icon fix made Next actually emit a `<link rel="icon">`
+  for the first time, which meant it started rendering the wrong logo instead of
+  quietly 404ing. Replaced with a mark drawn from the hero's own
+  `components/sun.tsx` gradient: the same colour stops, made opaque to the edge
+  since the corona falloff vanishes below 32px. The two orphaned PNGs this item
+  used to reference, `public/icon-dark-32x32.png` and `icon-light-32x32.png`,
+  turned out to be rasterised copies of the same v0 mark and were deleted rather
+  than wired up.
 - `display-condensed` resolves to the plain system sans stack at
   `font-stretch: 100%`. Nothing is actually condensed and the site loads no
   webfont, which is why the hero headline needs so much width and why the fix in

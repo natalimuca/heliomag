@@ -364,6 +364,30 @@ The static Pages build logged two 404s on every visit.
 Verified by serving the real static export under `/heliomag/` and recording every
 network response. Zero failed or 4xx requests. Commit `962ce99`.
 
+### Fixing the 404 surfaced a second, invisible bug
+
+The icon file the `962ce99` fix made Next actually serve was never inspected
+before that point, because it had been silently 404ing since the project began
+and nobody had reason to open it. It turned out to be the placeholder v0.dev
+logo mark left over from scaffolding the site with v0, a stylised "V0" glyph,
+not heliomag branding. A separate `generator: 'v0.app'` meta tag had already
+been removed in an earlier commit, but the logo file itself was never swapped.
+
+So the 404 fix had a side effect: it took a wrong logo from invisible to
+visible. Fixing a deploy bug uncovered a branding bug that the deploy bug had
+been accidentally hiding.
+
+**Fix.** Replaced `app/icon.svg` and regenerated `app/apple-icon.png` to match,
+drawing from `components/sun.tsx`'s own gradient stops rather than inventing a
+new mark: same colours, but opaque out to the edge, since the corona's
+transparent falloff is designed for a 260px hero badge and disappears entirely
+below 32px. A first attempt used a bold monospace "H" echoing the site's
+uppercase mono labels, but at favicon size a thick blocky H reads as a hospital
+or medical cross rather than a wordmark, so it was replaced with the sun orb.
+Two further leftover files, `public/icon-dark-32x32.png` and
+`icon-light-32x32.png`, turned out on inspection to be rasterised 32px copies
+of the same v0 mark rather than real assets, and were deleted.
+
 ### Bumping the workflow actions, and the trap inside it
 
 GitHub began force-running four actions on Node 24 with a deprecation warning.

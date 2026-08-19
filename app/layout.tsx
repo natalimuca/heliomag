@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   title: 'heliomag · research log',
   description:
     'heliomag compares an AI solar foundation model against classical geomagnetic-activity indices — reading the Sun for warnings Earth\'s own numbers miss.',
-  generator: 'v0.app',
 }
 
 export const viewport: Viewport = {

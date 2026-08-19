@@ -114,6 +114,17 @@ export function HeroScroll() {
             opacity: Math.max(earthP * 0.9, chromeP),
             background:
               'linear-gradient(105deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.86) 30%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.76) 100%)',
+            // The scrim MUST reach alpha 0 by the container's bottom edge.
+            // It dims the page-wide starfield, so if it stopped at full
+            // strength there, stars would be suppressed above the boundary and
+            // full-brightness below it — that brightness step is the seam.
+            // Because Earth now draws on top, this fade can span the strip
+            // (81%→100%) instead of having to finish above the limb: it is
+            // hidden behind the planet for most of its length, and over the
+            // last stretch both fade out together, so the transition ramps to
+            // zero instead of stepping.
+            maskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 100%)`,
+            WebkitMaskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 100%)`,
             pointerEvents: 'none',
           }}
         />

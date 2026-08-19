@@ -3,6 +3,7 @@
 **Does Surya, NASA/IBM's heliophysics foundation model, encode information about
 geomagnetic activity that classical scalar solar indices (sunspot number, F10.7)
 miss?** 
+
 Surya's own published evaluation stops at a single 4-day-lead solar-wind-speed
 forecast, benchmarked only against other neural nets — it never compares against
 classical indices, never predicts a geomagnetic index directly, and never tests

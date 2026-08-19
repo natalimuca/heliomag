@@ -82,6 +82,16 @@ export function HeroScroll() {
   const chromeP = isMobile ? 1 : remap(progress, 0.5, 0.82)
   const scrambleActive = isMobile ? true : progress > 0.52
 
+  // On desktop the hero is a fixed 100vh stage, so the headline must not be
+  // allowed to grow a line: a wrap there pushed the footer row past the
+  // container and overflow:hidden sliced it through the middle of its glyphs,
+  // which read as a full-width seam. Mobile lays out at auto height, so
+  // wrapping is harmless and narrow screens keep it.
+  const lineStyle: CSSProperties = {
+    display: 'block',
+    whiteSpace: isMobile ? 'normal' : 'nowrap',
+  }
+
   return (
     <section
       id="top"
@@ -290,7 +300,7 @@ export function HeroScroll() {
             }}
           >
             {/* headline column */}
-            <div style={{ maxWidth: 720, flex: '1 1 460px' }}>
+            <div style={{ maxWidth: 1100, flex: '1 1 460px' }}>
               <p
                 className="font-mono"
                 style={{
@@ -307,23 +317,32 @@ export function HeroScroll() {
               <h1
                 className="display-condensed"
                 style={{
-                  fontSize: 'clamp(34px, 5.4vw, 82px)',
+                  // The longest line, FOR WARNINGS EARTH'S, measures 12.4x the
+                  // font size in this face. The column gets the viewport minus
+                  // the padding, the gap and the verdict block, so the size has
+                  // to be capped by that width as well as by 5.4vw, or the line
+                  // wraps, the h1 doubles in height, and the whole content stack
+                  // overflows the 100vh stage. The 12vh term does the same job
+                  // for short viewports. At 1522x694 none of the extra terms
+                  // bind, so the intended 82px is unchanged.
+                  fontSize:
+                    'clamp(30px, min(5.4vw, 12vh, calc((100vw - 460px) / 13)), 82px)',
                   lineHeight: 0.96,
                   color: 'var(--ink)',
                   margin: 0,
                 }}
               >
-                <span style={{ display: 'block' }}>
+                <span style={lineStyle}>
                   <ScrambleText text="READING THE SUN" active={scrambleActive} />
                 </span>
-                <span style={{ display: 'block' }}>
+                <span style={lineStyle}>
                   <ScrambleText
                     text="FOR WARNINGS EARTH'S"
                     active={scrambleActive}
                     delay={120}
                   />
                 </span>
-                <span style={{ display: 'block', color: 'var(--gold-text)' }}>
+                <span style={{ ...lineStyle, color: 'var(--gold-text)' }}>
                   <ScrambleText
                     text="OWN NUMBERS MISS"
                     active={scrambleActive}

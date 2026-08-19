@@ -155,9 +155,9 @@ export function HeroScroll() {
             // bright pixels never butt into the next section. No top fade —
             // the arc is the top edge and fading it would erase the curve.
             maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.9) 63%, rgba(0,0,0,0.68) 74%, rgba(0,0,0,0.42) 84%, rgba(0,0,0,0.18) 93%, rgba(0,0,0,0) 100%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 24%, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.45) 69%, rgba(0,0,0,0.24) 82%, rgba(0,0,0,0.09) 92%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.9) 63%, rgba(0,0,0,0.68) 74%, rgba(0,0,0,0.42) 84%, rgba(0,0,0,0.18) 93%, rgba(0,0,0,0) 100%)',
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 24%, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.45) 69%, rgba(0,0,0,0.24) 82%, rgba(0,0,0,0.09) 92%, rgba(0,0,0,0) 100%)',
           }}
         >
           <div

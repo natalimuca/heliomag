@@ -434,7 +434,8 @@ export function BelowFold() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+            // auto-fit so this collapses to a single column on narrow screens
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: 'clamp(24px, 4vw, 48px)',
             alignItems: 'start',
           }}
@@ -751,7 +752,7 @@ export function BelowFold() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 'clamp(24px, 4vw, 56px)',
             alignItems: 'start',
           }}

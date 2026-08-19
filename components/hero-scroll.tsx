@@ -196,17 +196,16 @@ export function HeroScroll() {
               background: 'var(--line)',
             }}
           />
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: '46%',
-              height: 1,
-              background:
-                'linear-gradient(to right, transparent, var(--line) 12%, var(--line) 88%, transparent)',
-            }}
-          />
+          {/* No full-width horizontal rule at 46%. It was the twin of the
+              one removed from the footer row, and the same objection applies:
+              a 1px var(--line) band spanning the viewport reads as a page
+              seam, not as a guide. Measured on-screen at dpr 1.25 it painted
+              rgb(36,39,47) across 76% of the width — the only 1px line left
+              in the hero. It looked like a rendering artifact because it
+              only lands crisply when 46% of the viewport height falls on a
+              whole device pixel; at other zoom levels it splits across two
+              rows at half strength and reads as clean. The crosshair marks
+              still carry the 46% axis. */}
           <CrosshairMark left="62%" top="46%" />
           <CrosshairMark left="12%" top="46%" />
         </div>

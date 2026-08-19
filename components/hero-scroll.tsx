@@ -144,13 +144,11 @@ export function HeroScroll() {
             bottom: 0,
             height: `${EARTH_H * 100}vh`,
             opacity: earthP,
-            // NO transform here. Translating the masked strip pushed its
-            // fade-out region below the container's clip edge, so during the
-            // reveal the boundary met the strip's still-opaque middle — a hard
-            // cut that only disappeared once the animation finished. The
-            // rise now happens on the inner wrapper, leaving the mask pinned
-            // to the edge at every scroll position.
-            willChange: 'opacity',
+            // NO transform and no will-change on this masked, clipped strip.
+            // A transform dragged its fade region past the clip edge mid-
+            // scroll; will-change promotes it to a GPU layer whose clipped
+            // edge can render a hairline at fractional DPR. Both produced the
+            // same symptom — a thin cut at the bottom of the hero.
             overflow: 'hidden',
             // Only the bottom needs to reach alpha 0 by the container edge so
             // bright pixels never butt into the next section. No top fade —
@@ -173,16 +171,14 @@ export function HeroScroll() {
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,0.88) 36%, rgba(0,0,0,0.66) 50%, rgba(0,0,0,0.42) 63%, rgba(0,0,0,0.2) 76%, rgba(0,0,0,0.06) 85%, rgba(0,0,0,0) 90%, rgba(0,0,0,0) 100%)',
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              transform: `translateY(${lerp(18, 0, earthE)}%)`,
-              willChange: 'transform',
-            }}
-          >
-            <Earth diameterVw={EARTH_DISC_VW} />
-          </div>
+          {/* No transform and no will-change anywhere in here. Either one
+              promotes this to its own GPU layer inside an overflow:hidden
+              parent, and at a fractional device-pixel ratio Chrome can leave a
+              hairline along that layer's clipped edge — visible at 100% zoom,
+              clean at 90%, and immune to every CSS change because it is a
+              compositing artifact rather than something painted. The reveal is
+              carried by opacity alone, which does not need a layer. */}
+          <Earth diameterVw={EARTH_DISC_VW} />
         </div>
 
         {/* GUIDE LINES — crosshair + vertical divider */}

@@ -428,7 +428,11 @@ export function HeroScroll() {
               justifyContent: 'space-between',
               gap: 16,
               paddingTop: 18,
-              borderTop: '1px solid var(--line)',
+              // No border-top. A 1px full-width rule here read as a hard page
+              // seam across the hero — it sat just above this row, spanning
+              // the whole viewport, and was the horizontal line that survived
+              // every Earth, scrim and mask change, because it was never part
+              // of them.
               opacity: guideP,
             }}
           >

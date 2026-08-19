@@ -22,7 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased bg-surface text-ink">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {/* Vercel's analytics script is served by Vercel's edge, so on a static
+            GitHub Pages export the beacon has nothing to fetch and every visit
+            logs a 404 for /_vercel/insights/script.js. Gated at build time, so a
+            Vercel deploy still gets analytics. */}
+        {process.env.NODE_ENV === 'production' &&
+          process.env.GITHUB_PAGES !== 'true' && <Analytics />}
       </body>
     </html>
   )

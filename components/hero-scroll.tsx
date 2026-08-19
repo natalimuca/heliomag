@@ -98,13 +98,31 @@ export function HeroScroll() {
           overflow: 'hidden',
         }}
       >
+        {/* SCRIM — sits UNDER Earth, and covers the full height uniformly.
+            Order matters and was the root of a long-running seam: while the
+            scrim painted over Earth it had to fade out just above the limb so
+            it wouldn't dim the planet, and that fade made the starfield jump
+            from hidden to fully visible across a ~30px band — a bright strip
+            between the dark sky and the planet. With Earth drawn on top, the
+            scrim can dim the stars evenly everywhere and never touch the
+            planet, so there is no fade and therefore no band. */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: Math.max(earthP * 0.9, chromeP),
+            background:
+              'linear-gradient(105deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.86) 30%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.76) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+
         {/* EARTH — a viewport-clipping window holding one enormous circle.
-            Curvature and sharpness are decoupled here, which is the whole
-            point: the circle's radius sets how gently the limb arcs, while
-            the photo inside is scaled independently for detail. Tying them
-            together (a full-disc photo sized for the arc) forced a huge
-            upscale and looked like a ball; a real horizon photo has almost
-            no curvature at ISS altitude and looked flat. */}
+            Curvature and sharpness are decoupled: the circle's radius sets how
+            gently the limb arcs, and being drawn rather than photographed
+            there are no pixels to stretch. Rendered after the scrim so it
+            keeps its full brightness. */}
         <div
           aria-hidden={earthP < 0.05}
           style={{
@@ -126,44 +144,8 @@ export function HeroScroll() {
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.9) 63%, rgba(0,0,0,0.68) 74%, rgba(0,0,0,0.42) 84%, rgba(0,0,0,0.18) 93%, rgba(0,0,0,0) 100%)',
           }}
         >
-          {/* Drawn, not photographed — see components/earth.tsx. Every photo
-              tried here forced the same trade: sharp meant flat (an ISS
-              horizon is nearly straight), and curved meant upscaled and soft.
-              A gradient sphere has neither problem: the limb is a real circle
-              and there are no pixels to stretch. */}
           <Earth diameterVw={EARTH_DISC_VW} />
         </div>
-
-        {/* SCRIM behind the text block for legibility over bright Earth */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            opacity: Math.max(earthP * 0.9, chromeP),
-            // The second, vertical "to top" layer is load-bearing for how
-            // Earth reads: it dims the bottom of the frame so the planet
-            // sits back as a subtle dark curve instead of a bright, detailed
-            // surface competing with the headline. Removing it made Earth
-            // dominate the hero — do not drop it again.
-            background:
-              'linear-gradient(105deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.86) 30%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.76) 100%), linear-gradient(to top, rgba(0,0,0,0.16) 0%, rgba(0,0,0,0) 34%)',
-            // THE SEAM FIX. The page-wide starfield is a fixed background on
-            // <body> that shows through everything, so any overlay covering
-            // this container down to its bottom edge dims those stars — while
-            // the section below, having no overlay, shows them at full
-            // brightness. That star-brightness step across the boundary is
-            // the horizontal line, which is why changing Earth's crop or the
-            // gradient's alpha never removed it. Masking the whole scrim to
-            // alpha 0 over the last stretch means there is no step at the
-            // edge for any layer, whatever the gradients above do.
-            maskImage:
-              'linear-gradient(to bottom, #000 0%, #000 78%, transparent 81%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, #000 0%, #000 78%, transparent 81%)',
-            pointerEvents: 'none',
-          }}
-        />
 
         {/* GUIDE LINES — crosshair + vertical divider */}
         <div

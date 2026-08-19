@@ -216,6 +216,7 @@ data/            cached GFZ record + Surya embedding .npz files (gitignored wher
 notebooks/       surya_pipeline_check.ipynb — Colab T4 end-to-end pipeline validation
 kaggle/          heliomag-embedding-extraction.ipynb — batch GPU embedding extraction
 results/         pilot_kp.md, baseline_probe.md, regime_analysis.md, embedding_probe.md
+reports/         paper.md plus background, engineering log, limitations, future work
 app/, components/  Next.js findings page (this project's landing page / research log)
 ```
 

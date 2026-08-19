@@ -123,8 +123,9 @@ export function HeroScroll() {
             // hidden behind the planet for most of its length, and over the
             // last stretch both fade out together, so the transition ramps to
             // zero instead of stepping.
-            maskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 100%)`,
-            WebkitMaskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 100%)`,
+            // Also lands on 0 before the edge, for the same rounding reason.
+            maskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 95%, transparent 100%)`,
+            WebkitMaskImage: `linear-gradient(to bottom, #000 0%, #000 ${((1 - EARTH_H) * 100).toFixed(0)}%, transparent 95%, transparent 100%)`,
             pointerEvents: 'none',
           }}
         />
@@ -155,9 +156,21 @@ export function HeroScroll() {
             // bright pixels never butt into the next section. No top fade —
             // the arc is the top edge and fading it would erase the curve.
             maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 24%, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.45) 69%, rgba(0,0,0,0.24) 82%, rgba(0,0,0,0.09) 92%, rgba(0,0,0,0) 100%)',
+              // Reaches alpha 0 at 90%, not 100%. The strip's height is a vh
+              // value, so on a fractional device-pixel ratio (a 125%-scaled
+              // display at 100% browser zoom) the clip edge can round onto a
+              // row that is still faintly opaque — a 1px cut that disappears
+              // at other zoom levels. Finishing the fade early leaves the last
+              // ~10% as dead transparent space for rounding to land in.
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,0.88) 36%, rgba(0,0,0,0.66) 50%, rgba(0,0,0,0.42) 63%, rgba(0,0,0,0.2) 76%, rgba(0,0,0,0.06) 85%, rgba(0,0,0,0) 90%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 24%, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.45) 69%, rgba(0,0,0,0.24) 82%, rgba(0,0,0,0.09) 92%, rgba(0,0,0,0) 100%)',
+              // Reaches alpha 0 at 90%, not 100%. The strip's height is a vh
+              // value, so on a fractional device-pixel ratio (a 125%-scaled
+              // display at 100% browser zoom) the clip edge can round onto a
+              // row that is still faintly opaque — a 1px cut that disappears
+              // at other zoom levels. Finishing the fade early leaves the last
+              // ~10% as dead transparent space for rounding to land in.
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,0.88) 36%, rgba(0,0,0,0.66) 50%, rgba(0,0,0,0.42) 63%, rgba(0,0,0,0.2) 76%, rgba(0,0,0,0.06) 85%, rgba(0,0,0,0) 90%, rgba(0,0,0,0) 100%)',
           }}
         >
           <div

@@ -143,8 +143,13 @@ export function HeroScroll() {
             bottom: 0,
             height: `${EARTH_H * 100}vh`,
             opacity: earthP,
-            transform: `translateY(${lerp(18, 0, earthE)}%)`,
-            willChange: 'transform, opacity',
+            // NO transform here. Translating the masked strip pushed its
+            // fade-out region below the container's clip edge, so during the
+            // reveal the boundary met the strip's still-opaque middle — a hard
+            // cut that only disappeared once the animation finished. The
+            // rise now happens on the inner wrapper, leaving the mask pinned
+            // to the edge at every scroll position.
+            willChange: 'opacity',
             overflow: 'hidden',
             // Only the bottom needs to reach alpha 0 by the container edge so
             // bright pixels never butt into the next section. No top fade —
@@ -155,7 +160,16 @@ export function HeroScroll() {
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.9) 63%, rgba(0,0,0,0.68) 74%, rgba(0,0,0,0.42) 84%, rgba(0,0,0,0.18) 93%, rgba(0,0,0,0) 100%)',
           }}
         >
-          <Earth diameterVw={EARTH_DISC_VW} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              transform: `translateY(${lerp(18, 0, earthE)}%)`,
+              willChange: 'transform',
+            }}
+          >
+            <Earth diameterVw={EARTH_DISC_VW} />
+          </div>
         </div>
 
         {/* GUIDE LINES — crosshair + vertical divider */}

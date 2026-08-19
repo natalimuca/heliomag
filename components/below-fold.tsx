@@ -208,7 +208,6 @@ export function BelowFold() {
 
   const skill = SKILL[target]
   const variants = VARIANTS[target]
-  const unit = target === 'Ap' ? 'RMSE' : 'RMSE'
 
   return (
     <div
@@ -634,7 +633,7 @@ export function BelowFold() {
 
         <GroupedBars
           categories={LEADS}
-          unit={unit}
+          unit="RMSE"
           series={[
             { label: 'Persistence', color: '#3a4150', values: skill.persistence },
             { label: 'Classical', color: '#6b7383', values: skill.classical },

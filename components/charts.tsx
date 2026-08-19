@@ -3,6 +3,17 @@
 import { useEffect, useState } from 'react'
 import { useInView, reduceMotion } from './use-in-view'
 
+/**
+ * Reads the reduced-motion preference after mount. Starts false so server and
+ * client render the same markup, then disables the transitions if the reader
+ * has asked for less motion.
+ */
+function useStill() {
+  const [still, setStill] = useState(false)
+  useEffect(() => setStill(reduceMotion()), [])
+  return still
+}
+
 /** Counts a number up once it scrolls into view. */
 export function CountUp({
   to,
@@ -61,13 +72,16 @@ export function Reveal({
   style?: React.CSSProperties
 }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.15)
+  const still = useStill()
   return (
     <div
       ref={ref}
       style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(18px)',
-        transition: `opacity 620ms ease ${delay}ms, transform 620ms cubic-bezier(.2,.7,.3,1) ${delay}ms`,
+        opacity: still || inView ? 1 : 0,
+        transform: still || inView ? 'translateY(0)' : 'translateY(18px)',
+        transition: still
+          ? 'none'
+          : `opacity 620ms ease ${delay}ms, transform 620ms cubic-bezier(.2,.7,.3,1) ${delay}ms`,
         ...style,
       }}
     >
@@ -96,8 +110,10 @@ export function GroupedBars({
   height?: number
 }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.2)
+  const still = useStill()
   const [hover, setHover] = useState<{ c: number; s: number } | null>(null)
   const max = Math.max(...series.flatMap((s) => s.values)) * 1.14
+  const shown = still || inView
 
   return (
     <div ref={ref}>
@@ -150,10 +166,12 @@ export function GroupedBars({
                         flex: 1,
                         maxWidth: 56,
                         minWidth: 12,
-                        height: inView ? `${(s.values[ci] / max) * 100}%` : '0%',
+                        height: shown ? `${(s.values[ci] / max) * 100}%` : '0%',
                         background: s.color,
                         borderRadius: '4px 4px 0 0',
-                        transition: `height 780ms cubic-bezier(.2,.7,.3,1) ${si * 90 + ci * 60}ms, filter 160ms ease`,
+                        transition: still
+                          ? 'filter 160ms ease'
+                          : `height 780ms cubic-bezier(.2,.7,.3,1) ${si * 90 + ci * 60}ms, filter 160ms ease`,
                         filter: isHot ? 'brightness(1.35)' : 'none',
                         cursor: 'default',
                         outline: isBest ? '1px solid rgba(255,255,255,0.28)' : 'none',
@@ -222,6 +240,8 @@ export function DecayLine({
   height?: number
 }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.3)
+  const still = useStill()
+  const shown = still || inView
   const padL = 44
   const padB = 30
   const padT = 14
@@ -278,7 +298,7 @@ export function DecayLine({
               stroke="var(--gold)"
               strokeWidth="1"
               strokeDasharray="4 3"
-              opacity={inView ? 0.9 : 0}
+              opacity={shown ? 0.9 : 0}
               style={{ transition: 'opacity 500ms ease 700ms' }}
             />
             {refLabel && (
@@ -287,7 +307,7 @@ export function DecayLine({
                 y={sy(refLevel) - 6}
                 textAnchor="end"
                 fill="var(--gold-text)"
-                opacity={inView ? 1 : 0}
+                opacity={shown ? 1 : 0}
                 style={{
                   fontSize: 9,
                   fontFamily: 'var(--font-mono)',
@@ -304,7 +324,7 @@ export function DecayLine({
         <path
           d={area}
           fill="url(#decayFill)"
-          opacity={inView ? 1 : 0}
+          opacity={shown ? 1 : 0}
           style={{ transition: 'opacity 700ms ease 300ms' }}
         />
         <path
@@ -316,8 +336,8 @@ export function DecayLine({
           strokeLinejoin="round"
           style={{
             strokeDasharray: 1200,
-            strokeDashoffset: inView ? 0 : 1200,
-            transition: 'stroke-dashoffset 1100ms cubic-bezier(.2,.7,.3,1)',
+            strokeDashoffset: shown ? 0 : 1200,
+            transition: still ? 'none' : 'stroke-dashoffset 1100ms cubic-bezier(.2,.7,.3,1)',
           }}
         />
 
@@ -328,7 +348,7 @@ export function DecayLine({
               cy={sy(p.y)}
               r="3.2"
               fill="var(--accent)"
-              opacity={inView ? 1 : 0}
+              opacity={shown ? 1 : 0}
               style={{ transition: `opacity 300ms ease ${400 + i * 110}ms` }}
             />
             <text
